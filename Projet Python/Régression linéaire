@@ -1,0 +1,61 @@
+import numpy as np
+from sklearn.datasets import make_regression
+import matplotlib.pyplot as plt
+
+#Création d'un data set
+x,y = make_regression(n_samples=100,n_features=1,noise=5)
+plt.scatter(x,y)
+plt.show()
+
+#Verification de la forme des matrices
+print(x.shape)  
+print(y.shape)
+y = y.reshape(y.shape[0],1)
+print(y.shape)
+
+#Creation de la matrice X Il sera utile pour la fonction affine "predictive"
+X = np.hstack((np.ones((x.shape[0],1)),x))
+print(X.shape)
+#Creation de la matrice theta [A,B] ou A et B sont les parametres du modele lineaire
+theta = np.random.randn(2,1)
+print(theta.shape)
+
+#Creation du modele lineaire F=X*theta
+def model(X,theta):
+    return X.dot(theta)
+
+#Affichage du modele lineaire
+plt.scatter(x,y)
+plt.plot(x,model(X,theta),color='red') 
+plt.show()
+
+#Creation de la fonction cout elle renvoie la moyenne des erreurs au carres
+def fonction_cout(X,y,theta):
+    m = len(y)
+    return (1/2*m)*np.sum((model(X,theta)-y)**2)
+
+print(fonction_cout(X,y,theta))
+
+#GRADIENT DESCENT
+
+#Definition du gradient
+def grad(X,y,theta):
+    m = len(y)
+    return (1/m)*X.T.dot(model(X,theta)-y)
+
+#Definition de la fonction gradient descent
+
+def descente_gradient(X,y,theta,alpha,iterations):
+    #Iter pour mettre a jour theta
+    for i in range(iterations):
+        theta = theta - alpha*grad(X,y,theta)
+    return theta
+
+print("Avant descente de gradient :",theta)
+theta_final = descente_gradient(X,y,theta,0.01,1000)
+
+model_final = model(X,theta_final)
+print("Apres descente de gradient :",theta_final)   
+plt.scatter(x,y)
+plt.plot(x,model_final,color='red')
+plt.show()
