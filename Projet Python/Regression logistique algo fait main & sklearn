@@ -1,0 +1,88 @@
+
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+
+
+
+#Algo fait main
+
+
+# Sigmoïde
+def Sigmoide(z):
+    return 1 / (1 + np.exp(-z))
+
+# Fonction coût
+def cout(yi, y_chap):
+    m = len(yi)
+    loss = -(1/m) * np.sum(
+        yi * np.log(y_chap) + (1 - yi) * np.log(1 - y_chap)
+    )
+    return loss
+
+# Modèle
+def model(X, yi, alpha=0.1, iteration=100):
+
+    m, n = X.shape
+    w = np.zeros(n)
+    b = 0
+    losses = []
+
+    for i in range(iteration):
+
+        # Forward
+        z = np.dot(X, w) + b
+        y_chap = Sigmoide(z)
+
+        # Loss
+        loss = cout(yi, y_chap)
+        losses.append(loss)
+
+        # Gradients CORRECTS
+        grad_w = (1/m) * np.dot(X.T, (y_chap - yi))
+        grad_b = (1/m) * np.sum(y_chap - yi)
+
+        # Update
+        w -= alpha * grad_w
+        b -= alpha * grad_b
+
+    return w, b, losses
+
+X = np.array([
+    [1],
+    [2],
+    [3],
+    [4],
+    [5],
+    [6]
+])
+
+yi = np.array([0, 0, 0, 1, 1, 1])
+
+w, b, losses = model(X, yi, alpha=0.1, iteration=1000)
+
+print("Poids w :", w)
+print("Bias b :", b)
+print("Dernière loss :", losses[-1])
+
+print("##############################")
+print("-----2nd model-----")
+print("##############################")
+# Model sk learn
+
+# 8 points
+pts = np.linspace(0, 40, num=8, endpoint=True)
+
+# reshape en 2D
+PTS = pts.reshape(-1, 1)
+
+retire = np.array([0, 0, 0, 0, 0, 1, 1, 1])
+
+model = LogisticRegression()
+model.fit(PTS, retire)
+
+print("w =", model.coef_)
+print("b =", model.intercept_)
+
+# prédiction pour 3 points
+print(model.predict([[25]])) #PLUS SIMPLE ET PLUS RAPIDE 
+
